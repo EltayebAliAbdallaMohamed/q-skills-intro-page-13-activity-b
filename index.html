@@ -2,237 +2,246 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Audio Comprehension Quiz</title>
-
-<!-- iPhone / Mobile Optimization -->
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Word Order Practice</title>
 
 <style>
   body {
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, Arial, sans-serif;
-    max-width: 700px;
+    font-family: Arial, sans-serif;
+    max-width: 800px;
     margin: auto;
-    padding: 16px;
-    line-height: 1.7;
-    font-size: 18px;
-    background: #ffffff;
-  }
-
-  h1 {
-    text-align: center;
-    font-size: 22px;
-  }
-
-  h2 {
-    font-size: 18px;
-    color: #005eff;
+    padding: 20px;
     text-align: center;
   }
 
-  .audio-box {
-    margin-bottom: 18px;
-  }
+  h2 { font-size: 24px; }
 
-  audio {
-    width: 100%;
-    margin-top: 6px;
-  }
-
-  .option {
-    display: block;
-    padding: 14px;
+  #info {
+    font-size: 18px;
     margin-bottom: 10px;
-    border: 2px solid #ddd;
-    border-radius: 10px;
+  }
+
+  #wordButtons {
+    margin: 15px 0;
+  }
+
+  .wordBtn {
+    font-size: 18px;
+    padding: 10px 14px;
+    margin: 5px;
     cursor: pointer;
   }
 
-  .option input {
-    transform: scale(1.4);
-    margin-right: 12px;
-  }
-
-  .option:active {
-    background: #f0f4ff;
+  textarea {
+    width: 100%;
+    height: 70px;
+    font-size: 20px;
+    padding: 10px;
   }
 
   button {
+    font-size: 18px;
+    padding: 12px;
+    margin: 6px 0;
     width: 100%;
-    padding: 14px;
+  }
+
+  #feedback {
+    font-size: 22px;
+    margin-top: 12px;
+    min-height: 30px;
+  }
+
+  #arabicHint {
+    font-size: 20px;
     margin-top: 10px;
-    font-size: 18px;
-    border: none;
-    border-radius: 12px;
-    background: #005eff;
-    color: #ffffff;
+    display: none;
   }
 
-  button:disabled {
-    background: #cccccc;
-  }
-
-  .feedback {
-    margin-top: 16px;
-    font-weight: bold;
-    font-size: 18px;
-    min-height: 1.5em;
-  }
-
-  .nav-buttons {
-    margin-top: 20px;
-  }
-
-  footer {
-    margin-top: 40px;
-    padding-top: 12px;
-    border-top: 1px solid #ddd;
-    text-align: center;
-    font-size: 14px;
-    color: #555;
+  @media (min-width: 600px) {
+    button { width: auto; }
   }
 </style>
 </head>
 
 <body>
 
-<h1>Q Skills Intro L&amp;S – Page 3</h1>
-<h4 style="color: blue;">Listen to Audio 1 and 2. Answer the question.</h4>
+<h2>Put the words in the correct order</h2>
 
-<div id="quiz"></div>
+<p id="info"></p>
+<p id="score"></p>
 
-<div class="feedback" id="feedback" aria-live="polite"></div>
+<div id="wordButtons"></div>
 
-<div class="nav-buttons">
-  <button onclick="prevQuestion()" id="prevBtn">⬅ Previous</button>
-  <button onclick="checkAnswer()">✅ Check Answer</button>
-  <button onclick="nextQuestion()" id="nextBtn">Next ➡</button>
-</div>
+<textarea id="answerBox" placeholder="Tap words or type here"></textarea>
 
-<footer>
-  <p>
-    © 2026 – Created by: <strong>Eltayeb Ali Abdalla Mohamed</strong><br>
-    All rights reserved.
-  </p>
-</footer>
+<button onclick="checkAnswer()">Check Answer</button>
+<button onclick="speakScrambled()">🔊 Hear Words</button>
+<button onclick="showHint()">Hint</button>
+<button onclick="toggleArabic()">Arabic Hint</button>
+<button onclick="clearAnswer()">Clear</button>
+<button onclick="previousSentence()">Previous</button>
+<button onclick="nextSentence()">Next</button>
+
+<p id="arabicHint"></p>
+<p id="feedback"></p>
 
 <script>
-const questions = [
+/* ================= SENTENCES ================= */
+const sentences = [
   {
-    audioMain: "teacher_una_Q1.mp3",
-    audioQuestion: "una_teacher_A1.mp3",
-    questionText: "What are they talking about?",
-    options: ["Hobbies and interests", "Rules of a game", "School exams"],
-    answer: 0
+    scrambled: "you / from / where / are",
+    correct: "Where are you from?",
+    arabic: "من أين أنت؟"
   },
   {
-    audioMain: "teacher_felix_Q1.mp3",
-    audioQuestion: "felix_teacher_A1.mp3",
-    questionText: "What is Felix interested in?",
-    options: ["Cooking", "Playing soccer", "Languages"],
-    answer: 2
+    scrambled: "interested / hiking / you / in / are",
+    correct: "Are you interested in hiking?",
+    arabic: "هل أنت مهتمّ برياضة المشي؟"
   },
   {
-    audioMain: "teacher_marcus_Q1.mp3",
-    audioQuestion: "marcus_teacher_A1.mp3",
-    questionText: "What is Marcus interested in?",
-    options: ["Sports", "Only sports soccer", "Languages"],
-    answer: 0
+    scrambled: "at / you / are / what / good",
+    correct: "What are you good at?",
+    arabic: "بماذا أنت بارع؟"
   },
   {
-    audioMain: "teacher_marcus_Q2.mp3",
-    audioQuestion: "marcus_teacher_A2.mp3",
-    questionText: "What is his favorite sport?",
-    options: ["Basketball", "Tennis", "Soccer"],
-    answer: 2
+    scrambled: "years / 20 / old / you / are",
+    correct: "Are you 20 years old?",
+    arabic: "هل عمرك عشرون سنة؟"
   },
-  {
-    audioMain: "teacher_sophy_Q1.mp3",
-    audioQuestion: "sophy_teacher_A1.mp3",
-    questionText: "What is Sophy interested in?",
-    options: ["Sports", "History", "Math"],
-    answer: 1
-  }
 ];
 
-let currentQuestion = 0;
-let userAnswers = [];
 
-function loadQuestion() {
-  const q = questions[currentQuestion];
+let index = 0;
 
-  let html = `
-    <p><strong>Question ${currentQuestion + 1} of ${questions.length}</strong></p>
+/* RESET SCORE ON PAGE LOAD */
+localStorage.removeItem("score");
+let score = 0;
 
-    <div class="audio-box">
-      <strong>Audio 1</strong>
-      <audio controls playsinline preload="metadata">
-        <source src="${q.audioMain}" type="audio/mpeg">
-      </audio>
-    </div>
-  `;
+let answered = false;
 
-  if (q.audioQuestion) {
-    html += `
-      <div class="audio-box">
-        <strong>Audio 2</strong>
-        <audio controls playsinline preload="metadata">
-          <source src="${q.audioQuestion}" type="audio/mpeg">
-        </audio>
-      </div>
-    `;
-  }
+//let index = 0;
+//let score = Number(localStorage.getItem("score")) || 0;
+//let answered = false;
 
-  html += `<p>${q.questionText}</p>`;
-
-  q.options.forEach((option, index) => {
-    html += `
-      <label class="option">
-        <input type="radio" name="answer" value="${index}"
-          ${userAnswers[currentQuestion] == index ? "checked" : ""}>
-        ${option}
-      </label>
-    `;
-  });
-
-  document.getElementById("quiz").innerHTML = html;
+/* ================= LOAD ================= */
+function loadSentence() {
+  answered = false;
+  document.getElementById("answerBox").value = "";
   document.getElementById("feedback").textContent = "";
+  document.getElementById("arabicHint").style.display = "none";
 
-  document.getElementById("prevBtn").disabled = currentQuestion === 0;
-  document.getElementById("nextBtn").disabled = currentQuestion === questions.length - 1;
+  document.getElementById("info").textContent =
+    `Sentence ${index + 1} of ${sentences.length}`;
+
+  document.getElementById("score").textContent =
+    `Score: ${score}`;
+
+  loadWords();
+}
+
+/* ================= WORD BUTTONS ================= */
+function loadWords() {
+  const container = document.getElementById("wordButtons");
+  container.innerHTML = "";
+
+  let words = sentences[index].scrambled.split(" / ");
+  shuffle(words);
+
+  words.forEach(word => {
+    const btn = document.createElement("button");
+    btn.textContent = word;
+    btn.className = "wordBtn";
+    btn.onclick = () => addWord(word);
+    container.appendChild(btn);
+  });
+}
+
+function addWord(word) {
+  const box = document.getElementById("answerBox");
+  box.value += (box.value ? " " : "") + word;
+}
+
+/* ================= CHECK ================= */
+function normalize(text) {
+  return text.toLowerCase().trim().replace(/\s+/g, " ");
 }
 
 function checkAnswer() {
-  const selected = document.querySelector('input[name="answer"]:checked');
+  const user = normalize(answerBox.value);
+  const correct = normalize(sentences[index].correct);
 
-  if (!selected) {
-    document.getElementById("feedback").textContent = "Please select an answer.";
-    return;
-  }
-
-  const answer = parseInt(selected.value);
-  userAnswers[currentQuestion] = answer;
-
-  document.getElementById("feedback").textContent =
-    answer === questions[currentQuestion].answer
-      ? "Correct ✔️"
-      : "Incorrect ❌";
-}
-
-function nextQuestion() {
-  if (currentQuestion < questions.length - 1) {
-    currentQuestion++;
-    loadQuestion();
+  if (user === correct) {
+    if (!answered) {
+      score++;
+      localStorage.setItem("score", score);
+      answered = true;
+    }
+    feedback.textContent = "✅ Correct! Well done!";
+    speak(sentences[index].correct);
+    scoreDisplay();
+  } else {
+    feedback.textContent = "❌ Try again.";
   }
 }
 
-function prevQuestion() {
-  if (currentQuestion > 0) {
-    currentQuestion--;
-    loadQuestion();
+function scoreDisplay() {
+  document.getElementById("score").textContent = `Score: ${score}`;
+}
+
+/* ================= AUDIO ================= */
+function speak(text) {
+  speechSynthesis.cancel();
+  const msg = new SpeechSynthesisUtterance(text);
+  msg.rate = 0.85;
+  speechSynthesis.speak(msg);
+}
+
+function speakScrambled() {
+  speak(sentences[index].scrambled.replaceAll(" / ", " "));
+}
+
+/* ================= HINTS ================= */
+function showHint() {
+  answerBox.value = sentences[index].correct.split(" ")[0];
+}
+
+function toggleArabic() {
+  const hint = document.getElementById("arabicHint");
+  hint.textContent = sentences[index].arabic;
+  hint.style.display =
+    hint.style.display === "none" ? "block" : "none";
+}
+
+/* ================= NAV ================= */
+function nextSentence() {
+  if (index < sentences.length - 1) {
+    index++;
+    loadSentence();
   }
 }
 
-loadQuestion();
+function previousSentence() {
+  if (index > 0) {
+    index--;
+    loadSentence();
+  }
+}
+
+function clearAnswer() {
+  answerBox.value = "";
+}
+
+/* ================= SHUFFLE ================= */
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+}
+
+/* ================= START ================= */
+loadSentence();
 </script>
 
 </body>
