@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Audio Comprehension Quiz</title>
+
+<!-- iPhone / Mobile Optimization -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<style>
+  body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+    max-width: 700px;
+    margin: auto;
+    padding: 16px;
+    line-height: 1.7;
+    font-size: 18px;
+    background: #ffffff;
+  }
+
+  h1 {
+    text-align: center;
+    font-size: 22px;
+  }
+
+  h2 {
+    font-size: 18px;
+    color: #005eff;
+    text-align: center;
+  }
+
+  .audio-box {
+    margin-bottom: 18px;
+  }
+
+  audio {
+    width: 100%;
+    margin-top: 6px;
+  }
+
+  .option {
+    display: block;
+    padding: 14px;
+    margin-bottom: 10px;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    cursor: pointer;
+  }
+
+  .option input {
+    transform: scale(1.4);
+    margin-right: 12px;
+  }
+
+  .option:active {
+    background: #f0f4ff;
+  }
+
+  button {
+    width: 100%;
+    padding: 14px;
+    margin-top: 10px;
+    font-size: 18px;
+    border: none;
+    border-radius: 12px;
+    background: #005eff;
+    color: #ffffff;
+  }
+
+  button:disabled {
+    background: #cccccc;
+  }
+
+  .feedback {
+    margin-top: 16px;
+    font-weight: bold;
+    font-size: 18px;
+    min-height: 1.5em;
+  }
+
+  .nav-buttons {
+    margin-top: 20px;
+  }
+
+  footer {
+    margin-top: 40px;
+    padding-top: 12px;
+    border-top: 1px solid #ddd;
+    text-align: center;
+    font-size: 14px;
+    color: #555;
+  }
+</style>
+</head>
+
+<body>
+
+<h1>Q Skills Intro L&amp;S – Page 3</h1>
+<h4 style="color: blue;">Listen to Audio 1 and 2. Answer the question.</h4>
+
+<div id="quiz"></div>
+
+<div class="feedback" id="feedback" aria-live="polite"></div>
+
+<div class="nav-buttons">
+  <button onclick="prevQuestion()" id="prevBtn">⬅ Previous</button>
+  <button onclick="checkAnswer()">✅ Check Answer</button>
+  <button onclick="nextQuestion()" id="nextBtn">Next ➡</button>
+</div>
+
+<footer>
+  <p>
+    © 2026 – Created by: <strong>Eltayeb Ali Abdalla Mohamed</strong><br>
+    All rights reserved.
+  </p>
+</footer>
+
+<script>
+const questions = [
+  {
+    audioMain: "teacher_una_Q1.mp3",
+    audioQuestion: "una_teacher_A1.mp3",
+    questionText: "What are they talking about?",
+    options: ["Hobbies and interests", "Rules of a game", "School exams"],
+    answer: 0
+  },
+  {
+    audioMain: "teacher_felix_Q1.mp3",
+    audioQuestion: "felix_teacher_A1.mp3",
+    questionText: "What is Felix interested in?",
+    options: ["Cooking", "Playing soccer", "Languages"],
+    answer: 2
+  },
+  {
+    audioMain: "teacher_marcus_Q1.mp3",
+    audioQuestion: "marcus_teacher_A1.mp3",
+    questionText: "What is Marcus interested in?",
+    options: ["Sports", "Only sports soccer", "Languages"],
+    answer: 0
+  },
+  {
+    audioMain: "teacher_marcus_Q2.mp3",
+    audioQuestion: "marcus_teacher_A2.mp3",
+    questionText: "What is his favorite sport?",
+    options: ["Basketball", "Tennis", "Soccer"],
+    answer: 2
+  },
+  {
+    audioMain: "teacher_sophy_Q1.mp3",
+    audioQuestion: "sophy_teacher_A1.mp3",
+    questionText: "What is Sophy interested in?",
+    options: ["Sports", "History", "Math"],
+    answer: 1
+  }
+];
+
+let currentQuestion = 0;
+let userAnswers = [];
+
+function loadQuestion() {
+  const q = questions[currentQuestion];
+
+  let html = `
+    <p><strong>Question ${currentQuestion + 1} of ${questions.length}</strong></p>
+
+    <div class="audio-box">
+      <strong>Audio 1</strong>
+      <audio controls playsinline preload="metadata">
+        <source src="${q.audioMain}" type="audio/mpeg">
+      </audio>
+    </div>
+  `;
+
+  if (q.audioQuestion) {
+    html += `
+      <div class="audio-box">
+        <strong>Audio 2</strong>
+        <audio controls playsinline preload="metadata">
+          <source src="${q.audioQuestion}" type="audio/mpeg">
+        </audio>
+      </div>
+    `;
+  }
+
+  html += `<p>${q.questionText}</p>`;
+
+  q.options.forEach((option, index) => {
+    html += `
+      <label class="option">
+        <input type="radio" name="answer" value="${index}"
+          ${userAnswers[currentQuestion] == index ? "checked" : ""}>
+        ${option}
+      </label>
+    `;
+  });
+
+  document.getElementById("quiz").innerHTML = html;
+  document.getElementById("feedback").textContent = "";
+
+  document.getElementById("prevBtn").disabled = currentQuestion === 0;
+  document.getElementById("nextBtn").disabled = currentQuestion === questions.length - 1;
+}
+
+function checkAnswer() {
+  const selected = document.querySelector('input[name="answer"]:checked');
+
+  if (!selected) {
+    document.getElementById("feedback").textContent = "Please select an answer.";
+    return;
+  }
+
+  const answer = parseInt(selected.value);
+  userAnswers[currentQuestion] = answer;
+
+  document.getElementById("feedback").textContent =
+    answer === questions[currentQuestion].answer
+      ? "Correct ✔️"
+      : "Incorrect ❌";
+}
+
+function nextQuestion() {
+  if (currentQuestion < questions.length - 1) {
+    currentQuestion++;
+    loadQuestion();
+  }
+}
+
+function prevQuestion() {
+  if (currentQuestion > 0) {
+    currentQuestion--;
+    loadQuestion();
+  }
+}
+
+loadQuestion();
+</script>
+
+</body>
+</html>
